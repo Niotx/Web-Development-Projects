@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Psychological Test Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn:hover, .btn:focus {
+            background-color: #45a049;
+            outline: 3px solid #ffffff;
+        }
+        #start-test, #create-test {
+            display: block;
+            margin: 20px auto;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .options {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .option {
+            flex-basis: 18%;
+            margin-bottom: 10px;
+        }
+        #results, #admin-panel {
+            display: none;
+        }
+        .result-item {
+            margin-bottom: 20px;
+        }
+        .score {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .progress {
+            width: 0;
+            height: 20px;
+            background-color: #4CAF50;
+            border-radius: 5px;
+            transition: width 0.3s ease-in-out;
+        }
+        #admin-panel input, #admin-panel textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: 1px solid #4a4a4a;
+            border-radius: 5px;
+        }
+        #admin-panel button {
+            margin-right: 10px;
+        }
+        .preview {
+            border: 1px solid #4a4a4a;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        @media (max-width: 600px) {
+            .options {
+                flex-direction: column;
+            }
+            .option {
+                flex-basis: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Comprehensive Psychological Test Platform</h1>
+        <div id="intro">
+            <p>Welcome to our psychological test platform. You can take an existing test or create your own custom test.</p>
+            <button id="start-test" class="btn" aria-label="Start a psychological test">Take a Test</button>
+            <button id="create-test" class="btn" aria-label="Create a custom test">Create a Test</button>
+        </div>
+        <div id="test-list" style="display: none;">
+            <h2>Available Tests</h2>
+            <ul id="tests"></ul>
+        </div>
+        <div id="test" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div id="question-container"></div>
+            <button id="prev-question" class="btn" style="display: none;" aria-label="Go to previous question">Previous</button>
+            <button id="next-question" class="btn" style="display: none;" aria-label="Go to next question">Next</button>
+            <button id="submit-test" class="btn" style="display: none;" aria-label="Submit test and view results">Submit</button>
+        </div>
+        <div id="results" style="display: none;">
+            <h2>Your Results</h2>
+            <div id="results-container"></div>
+            <button id="back-to-intro" class="btn" aria-label="Go back to the introduction page">Back to Intro</button>
+        </div>
+        <div id="admin-panel" style="display: none;">
+            <h2>Create Custom Test</h2>
+            <input type="text" id="test-title" placeholder="Test Title">
+            <div id="questions-container"></div>
+            <button id="add-question" class="btn">Add Question</button>
+            <textarea id="results-calculation" placeholder="Results Calculation Logic (JSON)"></textarea>
+            <input type="number" id="timer" placeholder="Timer (in seconds, optional)">
+            <button id="preview-test" class="btn">Preview Test</button>
+            <button id="save-test" class="btn">Save Test</button>
+            <div id="preview-container" class="preview" style="display: none;"></div>
+        </div>
+    </div>
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let currentTest = null;
+        let currentQuestion = 0;
+        let answers = [];
+        let timer = null;
+
+        const intro = document.getElementById('intro');
+        const testList = document.getElementById('test-list');
+        const test = document.getElementById('test');
+        const questionContainer = document.getElementById('question-container');
+        const prevButton = document.getElementById('prev-question');
+        const nextButton = document.getElementById('next-question');
+        const submitButton = document.getElementById('submit-test');
+        const results = document.getElementById('results');
+        const resultsContainer = document.getElementById('results-container');
+        const backToIntroButton = document.getElementById('back-to-intro');
+        const progressBar = document.getElementById('progress');
+        const adminPanel = document.getElementById('admin-panel');
+        const previewContainer = document.getElementById('preview-container');
+
+        document.getElementById('start-test').addEventListener('click', showTestList);
+        document.getElementById('create-test').addEventListener('click', showAdminPanel);
+        backToIntroButton.addEventListener('click', showIntro);
+        document.getElementById('add-question').addEventListener('click', addQuestion);
+        document.getElementById('preview-test').addEventListener('click', previewTest);
+        document.getElementById('save-test').addEventListener('click', saveTest);
+
+        function showIntro() {
+            intro.style.display = 'block';
+            testList.style.display = 'none';
+            test.style.display = 'none';
+            results.style.display = 'none';
+            adminPanel.style.display = 'none';
+        }
+
+        function showTestList() {
+            fetch(`${API_URL}/tests`)
+                .then(response => response.json())
+                .then(tests => {
+                    const testListElement = document.getElementById('tests');
+                    testListElement.innerHTML = '';
+                    tests.forEach(test => {
+                        const li = document.createElement('li');
+                        const button = document.createElement('button');
+                        button.textContent = test.title;
+                        button.classList.add('btn');
+                        button.addEventListener('click', () => startTest(test.id));
+                        li.appendChild(button);
+                        testListElement.appendChild(li);
+                    });
+                    intro.style.display = 'none';
+                    testList.style.display = 'block';
+                });
+        }
+
+        function startTest(testId) {
+            fetch(`${API_URL}/tests/${testId}`)
+                .then(response => response.json())
+                .then(testData => {
+                    currentTest = testData;
+                    currentQuestion = 0;
+                    answers = [];
+                    testList.style.display = 'none';
+                    test.style.display = 'block';
+                    showQuestion();
+                    if (currentTest.timer) {
+                        startTimer(currentTest.timer);
+                    }
+                });
+        }
+
+        function showQuestion() {
+            const question = currentTest.questions[currentQuestion];
+            questionContainer.innerHTML = `
+                <div class="question">
+                    <h3>${question.text}</h3>
+                    ${question.image ? `<img src="${API_URL}/uploads/${question.image}" alt="Question Image">` : ''}
+                    <div class="options">
+                        ${question.options.map((option, index) => `
+                            <div class="option">
+                                <input type="radio" id="option${index}" name="answer" value="${index}" ${answers[currentQuestion] === index ? 'checked' : ''}>
+                                <label for="option${index}">${option.text}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            prevButton.style.display = currentQuestion > 0 ? 'inline-block' : 'none';
+            nextButton.style.display = currentQuestion < currentTest.questions.length - 1 ? 'inline-block' : 'none';
+            submitButton.style.display = currentQuestion === currentTest.questions.length - 1 ? 'inline-block' : 'none';
+
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestion + 1) / currentTest.questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        prevButton.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                answers[currentQuestion] = parseInt(selectedOption.value);
+                currentQuestion++;
+                showQuestion();
+            } else {
+                alert('Please select an answer before proceeding.');
+            }
+        });
+
+        submitButton.addEventListener('click', () => {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                answers[currentQuestion] = parseInt(selectedOption.value);
+                showResults();
+            } else {
+                alert('Please select an answer before submitting.');
+            }
+        });
+
+        function showResults() {
+            clearInterval(timer);
+            test.style.display = 'none';
+            results.style.display = 'block';
+
+            const score = calculateScore();
+
+            fetch(`${API_URL}/results`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    test_id: currentTest.id,
+                    

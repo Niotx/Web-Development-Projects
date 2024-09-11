@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - QR Code Website</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Your Profile</h2>
+        <form method="POST">
+            <div class="mb-3">
+                <label for="facebook" class="form-label">Facebook</label>
+                <input type="url" class="form-control" id="facebook" name="facebook" value="{{ current_user.social_media.facebook if current_user.social_media else '' }}">
+            </div>
+            <div class="mb-3">
+                <label for="twitter" class="form-label">Twitter</label>
+                <input type="url" class="form-control" id="twitter" name="twitter" value="{{ current_user.social_media.twitter if current_user.social_media else '' }}">
+            </div>
+            <div class="mb-3">
+                <label for="instagram" class="form-label">Instagram</label>
+                <input type="url" class="form-control" id="instagram" name="instagram" value="{{ current_user.social_media.instagram if current_user.social_media else '' }}">
+            </div>
+            <div class="mb-3">
+                <label for="website" class="form-label">Website</label>
+                <input type="url" class="form-control" id="website" name="website" value="{{ current_user.website or '' }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+        </form>
+
+        <div class="mt-5">
+            <h3>Your QR Code</h3>
+            <div id="qrcode"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Generate QR code
+        var qr = qrcode(0, 'M');
+        qr.addData('{{ url_for("user_landing", username=current_user.username, _external=True) }}');
+        qr.make();
+        document.getElementById('qrcode').innerHTML = qr.createImgTag(5);
+    </script>
+</body>
+</html>

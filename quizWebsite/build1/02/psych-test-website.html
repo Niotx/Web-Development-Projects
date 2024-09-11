@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Psychological Test</title>
+    <style>
+        /* ... (previous CSS styles) ... */
+        .question-image {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 15px;
+        }
+        #timer {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="test-title">Dynamic Psychological Test</h1>
+        <div id="intro">
+            <p>Welcome to our dynamic psychological test. Please answer all questions honestly for the most accurate results.</p>
+            <button id="start-test" class="btn" aria-label="Start the psychological test">Start Test</button>
+        </div>
+        <div id="test" style="display: none;">
+            <div id="timer"></div>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div id="question-container"></div>
+            <button id="prev-question" class="btn" style="display: none;" aria-label="Go to previous question">Previous</button>
+            <button id="next-question" class="btn" style="display: none;" aria-label="Go to next question">Next</button>
+            <button id="submit-test" class="btn" style="display: none;" aria-label="Submit test and view results">Submit</button>
+        </div>
+        <div id="results" style="display: none;">
+            <h2>Your Results</h2>
+            <div id="results-container"></div>
+            <button id="retake-test" class="btn" aria-label="Retake the psychological test">Retake Test</button>
+        </div>
+    </div>
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let currentTest = null;
+        let currentQuestion = 0;
+        let answers = [];
+        let timerInterval = null;
+        let remainingTime = 0;
+
+        const startTest = document.getElementById('start-test');
+        const intro = document.getElementById('intro');
+        const test = document.getElementById('test');
+        const questionContainer = document.getElementById('question-container');
+        const prevButton = document.getElementById('prev-question');
+        const nextButton = document.getElementById('next-question');
+        const submitButton = document.getElementById('submit-test');
+        const results = document.getElementById('results');
+        const resultsContainer = document.getElementById('results-container');
+        const retakeTest = document.getElementById('retake-test');
+        const progressBar = document.getElementById('progress');
+        const timerDisplay = document.getElementById('timer');
+
+        async function loadTest() {
+            try {
+                const response = await fetch(`${API_URL}/tests/1`);  // Load the first test
+                currentTest = await response.json();
+                document.getElementById('test-title').textContent = currentTest.title;
+                if (currentTest.timer) {
+                    remainingTime = currentTest.timer * 60;
+                    startTimer();
+                }
+            } catch (error) {
+                console.error('Error loading test:', error);
+            }
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                remainingTime--;
+                updateTimerDisplay();
+                if (remainingTime <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+            timerDisplay.textContent = `Time remaining: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        startTest.addEventListener('click', () => {
+            intro.style.display = 'none';
+            test.style.display = 'block';
+            showQuestion();
+        });
+
+        function showQuestion() {
+            const question = currentTest.questions[currentQuestion];
+            questionContainer.innerHTML = `
+                <div class="question">
+                    <h3>${question.text}</h3>
+                    ${question.image ? `<img src="${API_URL}/uploads/${question.image}" alt="Question image" class="question-image">` : ''}
+                    <div class="options">
+                        ${question.options.map((option, index) => `
+                            <div class="option">
+                                <input type="radio" id="option${index}" name="answer" value="${index}" ${answers[currentQuestion] === index ? 'checked' : ''}>
+                                <label for="option${index}">${option.text}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            prevButton.style.display = currentQuestion > 0 ? 'inline-block' : 'none';
+            nextButton.style.display = currentQuestion < currentTest.questions.length - 1 ? 'inline-block' : 'none';
+            submitButton.style.display = currentQuestion === currentTest.questions.length - 1 ? 'inline-block' : 'none';
+
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestion + 1) / currentTest.questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        prevButton.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                answers[currentQuestion] = parseInt(selectedOption.value);
+                currentQuestion++;
+                showQuestion();
+            } else {
+                alert('Please select an answer before proceeding.');
+            }
+        });
+
+        submitButton.addEventListener('click', submitTest);
+
+        async function submitTest() {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                answers[currentQuestion] = parseInt(selectedOption.value);
+            }
+
+            clearInterval(timerInterval);
+
+            const result = calculateResult();
+            await saveResult(result);
+            showResults(result);
+        }
+
+        function calculateResult() {
+            let scores = {};
+            currentTest.questions.forEach((question, index) => {
+                const answerIndex = answers[index];
+                const answer = question.options[answerIndex];
+                Object.keys(answer.scores).forEach(trait => {
+                    scores[trait] = (scores[trait] || 0) + answer.scores[trait];
+                });
+            });
+
+            let finalResult = null;
+            for (const condition of currentTest.resultsCalculation) {
+                if (eval(condition.condition)) {
+                    finalResult = condition.result;
+                    break;
+                }
+            }
+
+            return { scores, result: finalResult };
+        }
+
+        async function saveResult(result) {
+            try {
+                await fetch(`${API_URL}/results`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        testId: currentTest.id,
+                        answers: answers,
+                        result: result
+                    }),
+                });
+            } catch (error) {
+                console.error('Error saving result:', error);
+            }
+        }
+
+        function showResults(result) {
+            test.style.display = 'none';
+            results.style.display = 'block';
+
+            resultsContainer.innerHTML = `
+                <h3>${result.result.title}</h3>
+                <p>${result.result.description}</p>
+                <h4>Scores:</h4>
+                <ul>
+                    ${Object.entries(result.scores).map(([trait, score]) => `
+                        <li>${trait}: ${score}</li>
+                    `).join('')}
+                </ul>
+            `;
+        }
+
+        retakeTest.addEventListener('click', () => {
+            currentQuestion = 0;
+            answers = [];
+            results.style.display = 'none';
+            intro.style.display = 'block';
+            if (currentTest.timer) {
+                remainingTime = currentTest.timer * 60;
+                startTimer();
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+                nextButton.click();
+            }
+        });
+
+        loadTest();
+    </script>
+</body>
+</html>
