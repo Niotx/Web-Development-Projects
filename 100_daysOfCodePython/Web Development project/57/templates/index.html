@@ -6,8 +6,10 @@
     <title>My Website</title>
 </head>
 <body>
-    <h1>Hello World</h1>
-    <h2>Random Number: {{num}}</h2>
+    <h1>Hello {{name}}</h1>
+    <h2>I think you are {{gender.json()['gender']}},</h2>
+    <h3>and maybe {{age.json()['age']}} years old</h3>
+    
 </body>
 <footer>
     <p>&copy; copryright {{year}}</p>
