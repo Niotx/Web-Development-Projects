@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Psychological Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn:hover, .btn:focus {
+            background-color: #45a049;
+            outline: 3px solid #ffffff;
+        }
+        #start-test {
+            display: block;
+            margin: 20px auto;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .options {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .option {
+            flex-basis: 18%;
+            margin-bottom: 10px;
+        }
+        #results {
+            display: none;
+        }
+        .result-item {
+            margin-bottom: 20px;
+        }
+        .score {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .progress {
+            width: 0;
+            height: 20px;
+            background-color: #4CAF50;
+            border-radius: 5px;
+            transition: width 0.3s ease-in-out;
+        }
+        @media (max-width: 600px) {
+            .options {
+                flex-direction: column;
+            }
+            .option {
+                flex-basis: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Comprehensive Psychological Test</h1>
+        <div id="intro">
+            <p>Welcome to our comprehensive psychological test. This test will help you understand various aspects of your personality across five major traits. Please answer all questions honestly for the most accurate results.</p>
+            <button id="start-test" class="btn" aria-label="Start the psychological test">Start Test</button>
+        </div>
+        <div id="test" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div id="question-container"></div>
+            <button id="prev-question" class="btn" style="display: none;" aria-label="Go to previous question">Previous</button>
+            <button id="next-question" class="btn" style="display: none;" aria-label="Go to next question">Next</button>
+            <button id="submit-test" class="btn" style="display: none;" aria-label="Submit test and view results">Submit</button>
+        </div>
+        <div id="results" style="display: none;">
+            <h2>Your Results</h2>
+            <div id="results-container"></div>
+            <button id="retake-test" class="btn" aria-label="Retake the psychological test">Retake Test</button>
+        </div>
+    </div>
+    <script>
+        const questions = [
+            { question: "I enjoy being the center of attention.", trait: "Extraversion" },
+            { question: "I prefer to plan my activities in advance.", trait: "Conscientiousness" },
+            { question: "I often think about abstract concepts.", trait: "Openness" },
+            { question: "I am generally trusting of others.", trait: "Agreeableness" },
+            { question: "I rarely feel anxious or worried.", trait: "Neuroticism" },
+            { question: "I find it easy to make new friends.", trait: "Extraversion" },
+            { question: "I keep my belongings neat and organized.", trait: "Conscientiousness" },
+            { question: "I enjoy trying new and exotic foods.", trait: "Openness" },
+            { question: "I try to be kind to everyone I meet.", trait: "Agreeableness" },
+            { question: "I often feel overwhelmed by my emotions.", trait: "Neuroticism" },
+            { question: "I prefer quiet, solitary activities.", trait: "Extraversion" },
+            { question: "I often leave tasks unfinished.", trait: "Conscientiousness" },
+            { question: "I enjoy art and creative expression.", trait: "Openness" },
+            { question: "I tend to be skeptical of others' intentions.", trait: "Agreeableness" },
+            { question: "I remain calm under pressure.", trait: "Neuroticism" }
+        ];
+
+        const traits = ["Extraversion", "Conscientiousness", "Openness", "Agreeableness", "Neuroticism"];
+        let currentQuestion = 0;
+        let answers = [];
+
+        const startTest = document.getElementById('start-test');
+        const intro = document.getElementById('intro');
+        const test = document.getElementById('test');
+        const questionContainer = document.getElementById('question-container');
+        const prevButton = document.getElementById('prev-question');
+        const nextButton = document.getElementById('next-question');
+        const submitButton = document.getElementById('submit-test');
+        const results = document.getElementById('results');
+        const resultsContainer = document.getElementById('results-container');
+        const retakeTest = document.getElementById('retake-test');
+        const progressBar = document.getElementById('progress');
+
+        // Load progress from local storage
+        function loadProgress() {
+            const savedAnswers = localStorage.getItem('testAnswers');
+            if (savedAnswers) {
+                answers = JSON.parse(savedAnswers);
+                currentQuestion = answers.length;
+                updateProgressBar();
+            }
+        }
+
+        // Save progress to local storage
+        function saveProgress() {
+            localStorage.setItem('testAnswers', JSON.stringify(answers));
+        }
+
+        startTest.addEventListener('click', () => {
+            intro.style.display = 'none';
+            test.style.display = 'block';
+            loadProgress();
+            showQuestion();
+        });
+
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            questionContainer.innerHTML = `
+                <div class="question">
+                    <h3>${question.question}</h3>
+                    <div class="options">
+                        ${["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"].map((option, index) => `
+                            <div class="option">
+                                <input type="radio" id="option${index}" name="answer" value="${index}" ${answers[currentQuestion] === index ? 'checked' : ''}>
+                                <label for="option${index}">${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            prevButton.style.display = currentQuestion > 0 ? 'inline-block' : 'none';
+            nextButton.style.display = currentQuestion < questions.length - 1 ? 'inline-block' : 'none';
+            submitButton.style.display = currentQuestion === questions.length - 1 ? 'inline-block' : 'none';
+
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        prevButton.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                answers[currentQuestion] = parseInt(selectedOption.value);
+                saveProgress();
+                currentQuestion++;
+                showQuestion();
+            } else {
+                alert('Please select an answer before proceeding.');
+            }
+        });
+
+        submitButton.addEventListener('click', () => {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                answers[currentQuestion] = parseInt(selectedOption.value);
+                saveProgress();
+                showResults();
+            } else {
+                alert('Please select an answer before submitting.');
+            }
+        });
+
+        function showResults() {
+            test.style.display = 'none';
+            results.style.display = 'block';
+
+            const scores = calculateScores();
+
+            resultsContainer.innerHTML = traits.map((trait, index) => `
+                <div class="result-item">
+                    <h3>${trait}</h3>
+                    <p class="score">Score: ${scores[trait]}/15</p>
+                    <p>${getDescription(trait, scores[trait])}</p>
+                </div>
+            `).join('');
+
+            // Clear local storage after showing results
+            localStorage.removeItem('testAnswers');
+        }
+
+        function calculateScores() {
+            const scores = {};
+            traits.forEach(trait => scores[trait] = 0);
+
+            questions.forEach((question, index) => {
+                const answer = answers[index];
+                if (question.trait === "Neuroticism") {
+                    scores[question.trait] += 5 - answer; // Reverse scoring for Neuroticism
+                } else {
+                    scores[question.trait] += answer + 1; // Normal scoring for other traits
+                }
+            });
+
+            return scores;
+        }
+
+        function getDescription(trait, score) {
+            const descriptions = {
+                Extraversion: [
+                    "You tend to be more introverted, preferring solitary activities and small groups.",
+                    "You have a balance between extroversion and introversion, adapting to various social situations.",
+                    "You are highly extroverted, energized by social interactions and enjoy being around others."
+                ],
+                Conscientiousness: [
+                    "You tend to be more flexible and spontaneous, sometimes struggling with organization and planning.",
+                    "You have a balance between spontaneity and organization, adapting your approach based on the situation.",
+                    "You are highly organized, detail-oriented, and prefer structure in your daily life."
+                ],
+                Openness: [
+                    "You tend to be more conventional and practical, preferring familiar routines and ideas.",
+                    "You have a balance between traditional and new ideas, sometimes exploring novel concepts.",
+                    "You are highly open to new experiences, creative, and enjoy exploring abstract concepts."
+                ],
+                Agreeableness: [
+                    "You tend to be more competitive and skeptical, sometimes struggling to trust others easily.",
+                    "You have a balance between skepticism and trust, adapting your approach based on the situation.",
+                    "You are highly agreeable, cooperative, and generally trusting of others."
+                ],
+                Neuroticism: [
+                    "You tend to be emotionally stable and resilient, rarely experiencing negative emotions.",
+                    "You have a balance in your emotional responses, sometimes experiencing stress but generally managing well.",
+                    "You tend to experience more stress and emotional fluctuations, being more sensitive to your environment."
+                ]
+            };
+
+            const index = Math.floor(score / 6);
+            return descriptions[trait][index];
+        }
+
+        retakeTest.addEventListener('click', () => {
+            currentQuestion = 0;
+            answers = [];
+            results.style.display = 'none';
+            intro.style.display = 'block';
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+                nextButton.click();
+            }
+        });
+    </script>
+</body>
+</html>

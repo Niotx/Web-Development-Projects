@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>نتایج</title>
+</head>
+<body>
+    <h1>نتایج آزمون</h1>
+    <ul>
+        {% for question, answer in responses.items() %}
+        <li>{{ question }}: {{ answer }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('pdf_download') }}">دانلود فایل PDF</a>
+</body>
+</html>

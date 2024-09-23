@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>آزمون 60 سوالی NEO</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>آزمون 60 سوالی</h1>
+        <form action="/" method="post">
+
+            <div class="question">
+                <label for="question1">1. من اصولا شخص نگرانی نیستم.</label>
+                <input type="text" id="question1" name="question1">
+            </div>
+
+            <div class="question">
+                <label for="question2">2. دوست دارم همیشه افراد زیادی دور و برم باشند.</label>
+                <input type="text" id="question2" name="question2">
+            </div>
+
+            <div class="question">
+                <label for="question3">3. دوست ندارم وقتم را با خیال پردازی تلف كنم.</label>
+                <input type="text" id="question3" name="question3">
+            </div>
+
+            <div class="question">
+                <label for="question4">4. سعی میكنم در مقابل همه مودب باشم.</label>
+                <input type="text" id="question4" name="question4">
+            </div>
+
+            <div class="question">
+                <label for="question5">5. وسایل متعلق به خود را تمیز و مرتب نگاه می دارم.</label>
+                <input type="text" id="question5" name="question5">
+            </div>
+
+            <!-- Continue adding all 60 questions in this format -->
+
+            <button type="submit">ارسال</button>
+        </form>
+    </div>
+</body>
+</html>
