@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="راهنمای تعاملی برای دانشجویان ترم اول رشته کامپیوتر">
+    <title>راهنمای دانشجویان ترم اول کامپیوتر</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @font-face {
+            font-family: 'Vazirmatn';
+            src: url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
+            font-display: swap;
+        }
+        :root {
+            --bg-color: #1e1e1e;
+            --text-color: #00ff00;
+            --highlight-color: #0077ff;
+            --secondary-color: #888;
+            --hover-color: #004499;
+        }
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: var(--highlight-color);
+        }
+        .terminal-window {
+            border: 2px solid var(--text-color);
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid var(--secondary-color);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .section:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        a {
+            color: var(--highlight-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        a:hover {
+            color: var(--hover-color);
+            text-decoration: underline;
+        }
+        .icon {
+            margin-left: 10px;
+            color: var(--secondary-color);
+        }
+        #typing-effect {
+            border-right: 2px solid var(--text-color);
+            white-space: nowrap;
+            overflow: hidden;
+            margin: 0 auto;
+            letter-spacing: .15em;
+            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--text-color); }
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .nav-button {
+            background-color: var(--highlight-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .nav-button:hover {
+            background-color: var(--hover-color);
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: var(--secondary-color);
+            color: var(--bg-color);
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: var(--secondary-color);
+            margin-top: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress {
+            width: 0;
+            height: 20px;
+            background-color: var(--highlight-color);
+            text-align: center;
+            line-height: 20px;
+            color: var(--bg-color);
+            transition: width 0.5s ease;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="terminal-window">
+        <h1 id="typing-effect">راهنمای دانشجویان ترم اول کامپیوتر</h1>
+        
+        <div class="nav-buttons">
+            <button class="nav-button tooltip" onclick="showSection('greating')">
+            خوشآمد گویی
+            <span class="tooltiptext">تبریک به ورودی های جدید</span>
+            </button>
+            <button class="nav-button tooltip" onclick="showSection('quera')">
+                کوئرا
+                <span class="tooltiptext">پلتفرم حل تمرین</span>
+            </button>
+            <button class="nav-button tooltip" onclick="showSection('programming')">
+                برنامه‌نویسی
+                <span class="tooltiptext">اهمیت یادگیری کدنویسی</span>
+            </button>
+            <button class="nav-button tooltip" onclick="showSection('laptop')">
+                لپ‌تاپ
+                <span class="tooltiptext">راهنمای خرید لپ‌تاپ</span>
+            </button>
+            <button class="nav-button tooltip" onclick="showSection('linux')">
+                لینوکس
+                <span class="tooltiptext">آشنایی با سیستم‌عامل لینوکس</span>
+            </button>
+            <button class="nav-button tooltip" onclick="showSection('resources')">
+                منابع
+                <span class="tooltiptext">منابع آموزشی مفید</span>
+            </button>
+            <button class="nav-button tooltip" onclick="showSection('contact')">شماره ها 
+            سایت هـا و کانال های مفید 
+            <span class="tooltiptext">سایت هـا و کانالهای مفید دانشگاه</span>
+            </button>
+            <button class="nav-button tooltip" onclick="showSection('community')">
+                انجمن
+                <span class="tooltiptext">مشارکت در جامعه دانشجویی</span>
+            </button>
+        </div>
+        <div id="greating" class="section">
+            <p>در آغاز این مسیر پر از تجربھ و دانش، بھ شماً ورودیھای جدید دنیای مھندســـی کامپیوتر خوشآمد میگم. احتمالا بـــا ذھنی پر از اشتیاق و ھمچنیـــن کمی ترس و نگرانی بھ دانشـــگاه اومدید. این ترس و نگرانی طبیعیـــھ، چون شروع یک مسیر جدید ھمواره چالشھای خودش رو داره. من ھم توی این مطلب سعی کردم کھ یھ سری نکات رو کھ فکر میکنم مفید
+            باشھ رو بگم کھ ھمین اول کار با دید بازتری اطرافتون رو ببینید و حوزھای کھ توش قدم گذاشتید رو تجربھ کنید. شـــاید یکی از عجیبترین تجربھھاتون این باشھ کھ وقتی وارد دانشگاه میشید فقط یکی دو تا از درسھاتون رو توی دانشـــکده خودت ھستید و بقیشون رو باید تا مجتمع کلاسی یا دانشکده فنی برید. اما نگران نباشید از ترم بعد اکثر کلاسھا توی دانشـــکده خودمون برگزار میشھ بھ جز دروس عمومی کھ ھمون مجتمع کلاسیھ .</p>
+        </div>
+
+        <div id="quera" class="section">
+            <h2><i class="fas fa-code icon"></i> استفاده از کوئرا</h2>
+            <p>معمولا اســـتادهای درس مبانی برنامه نویسی، تمرینهای برنامه نویسی شـــون رو توی quera.ir قرارمـــیدن. اگراین کاررو نکردن خودتون حتما توی کوئرا ثبت نام کنید و از بانک سوالات این سایت ،سوالات رو به ترتیب بیشـــترین حل مرتب کنید و شروع کنید به حل اونها. این باعث میشه تفکر الگوریتمی شما قوی بشه و در آینده برای نوشتن برنامه هـــای مختلف به مشـــکل نخورید و حتی دیگـــران رو توی حل مشکلاتشون کمک کنید. شیوۀ کار کوئرا هم به این صورته که شما برای جواب دادن به هر تمرین یه برنامه مینویســـید و برنامه تون به صورت خودکار داوری میشـــه و بهتون نتیجهش نشون داده میشه. اگر استادتون توی کوئرا تمرین تعریف کرد، سیستم چک کردن تقلب هم داره و کدهاتون به صورت خودکار بررسی میشن، پس فکر تقلب رو نکنید چون به ضرر خودتون تموم میشه و در آینده برای حل ساده ترین مســـائل هم به مشکل میخورید. درسهای دیگه رو تقلب کنید ولی این یکی رو نه:( </p>
+            <p>لینک: <a href="https://quera.ir" target="_blank">Quera.ir</a></p>
+
+        </div>
+
+        <div id="programming" class="section">
+            <h2><i class="fas fa-laptop-code icon"></i> اهمیت برنامه‌نویسی</h2>
+            <p>اگر برنامه نویســـی بلدید و اومدید رشـــته کامپیوتر که کار خیلی خوبی کردید و میتونید از این قسمت بگذرید. درس برنامه نویسی توی درس هـــای ترم اول براتون جدیده و میخواد برنامه نویســـی رو توی یک ترم بهتـــون یاد بده. البته که فقط یه ســـر نخ به شـــما میده و شـــما باید خودتون برای ادامهش پیگیر باشـــید.
+                <br> یادگیری برنامه نویسی به زمان نیاز داره کـــه آدم بفهمه که دقیقا چه اتفاقـــی داره میفته. پس همون اول نترسید که هیچی یاد نمیگیرید یا بلد نیستید، چون با مفاهیم جدیدی دارید آشنا میشید ولی فقط به تمرینهای استاد و کلاس اکتفا نکنید و خودتـــون تمرین کنید. اصول اولیه برنامه نویســـی رو حتما خوب یاد بگیریـــد. چون در آینـــده توی هر زبانی که بخواید یاد بگیرید اســـتفاده میشن و فقط نحوه استفاده ازشون فرق داره. عبارتهای شرطی و انواع حلقه رو خیلی خوب با ســـوالات کوئرا تمرین کنید که کارتون با برنامه نویســـی همینجا تموم نمیشـــه و در آینده خیلی باهـــاش کار دارید. 
+مخصوصا در درس برنامهنویسی پیشرفته. اصلا هم نگران نباشید که شما مثلا توی خونه پایتون یاد گرفتید و توی دانشـــگاه بهتون سیپلاسپلاس یاد میدن. مبانی برنامه نویسی در تمام زبانها یکســـان هست. به نظرم ++C برای شروع و درک برنامهنویسی خیلـــی میتونه مفید باشـــه. بـــه حرف بقیه هم گـــوش ندید که ++C قدیمیه و هزارتا زبان جدید اومده. شما قراره مبانی برنامه نویسی رو یاد بگیرید. اصول و مفاهیم عمده برنامه نویسی رو میتونید با این زبان به بهترین شـــکل درک کنید و یاد بگیرید. خیلـــی از نرم افزارهای معروف مثـــل Adobe photoshop, Microsoft Office هم با همین زبان پیاده ســـازی شـــدن و همچنان هم توی خیلی از حوزه ها در حال استفاده هست. در مـــورد منابـــع هـــم بـــرای شروع، تـــوی youtube و یا ســـایت downloadly  کـــه آموزشهای   udemy  رو بـــه صورت رایگان در اختیارتون میذاره تا دلتون بخواد آموزش هســـت. ســـعی کنید تا می تونید برای یادگیری برنامه نویســـی از منابع خارجی استفاده کنید. چون خیلی کامل تر و مفهومی تر میتونید یاد بگیرید و چندان به منبع دیگهای جز داکیومنت اون زبان نیاز پیدا نمیکنید. 
+</p>
+        </div>
+
+        <div id="laptop" class="section">
+            <h2><i class="fas fa-laptop icon"></i> اهمیت داشتن لپ‌تاپ</h2>
+            <p>
+                تو درس مبانی برنامهنویسی )و کلی از درسهای ترمهای آینده( احتیاج بـــه برنامهنویســـی و به صـــورت ابتدایی تر، احتیاج بـــه کامپیوتر دارید. )منطقیه وقتی اومدیم رشـــته کامپیوتر، خب به کامپیوتر احتیاج داریم 
+دیگه!( به صورت تئوری، دانشـــگاه دولتی باید هرچی شـــما نیـــاز دارید رو در اختیارتون قرار بده ولی خب نباید منتظر چیزی باشید، سایت کامپیوتر دانشـــگاه معمولا بســـته اس یا داخلـــش کلاس برگـــزار میکنن. اگر خوابگاهی هستید هم به مشکل میخورید. در کل باید در به در دنبال یه کامپیوتر باشید یا حتی بدتر اینکه با گوشی کدنویسی کنید. پس نیاز به کامپیوتر شـــخصی دارید، ولی پیشنهاد من داشتن لپتاپه! لپتاپ رو به چند دلیل نسبت به کامپیوتر PC اولویت بدید: ۱- برای ارائهها یا انجام دادن پروژههای مختلف به کامپیوتر نیاز خواهید داشت. برای تحویل پروژه هم احتیاج به لپتاپ دارید. )البته میتونید موقتـــی قرض بگیرید ولی اینکه پروژهتون رو طوری تنظیم کنید که رو لپتاپ یه نفر دیگه کار کنه سخته.( ۲- زمـــان بین کلاسها میتونیـــد از زمانتون اســـتفاده کنید. حالا یا تکالیفتـــون رو انجام بدیـــد یا اینکه از وقتتون برای تمرین کدنویســـی استفاده کنید. ۳- از یه ترمبالایی مثلا TAمیخواید ســـوال بپرســـید و خودشون راحتتر در دســـترس هستن، اگر لپتاپ داشته باشید راحت میتونید سوالتون رو بپرسید ولی اگه بخواید براش برنامهتون رو بفرستید اذیت میشید. ولی در نهایـــت اگر بهتازگی کامپیوتر شـــخصی PCخریدید یا قصد نداریـــد هزینه کنید و یه دســـتگاه دیگـــه بخرید، میتونیـــد یه طوری بگذرونید. سخته ولی شدنیه! اما اگر به تازگی قصد خرید لپتاپ دارید این نکات رو در نظر داشـــته باشید برای انتخاب سیستم مناسب. البته که قطعا برای شروع با یک سیستم حداقلی هم کارتون راه میفته. 
+
+            </p>
+            <p>
+                ۱- برای کدنویســـی به سیســـتم چندان قویای نیـــاز ندارید ولی بعدا ممکنه به سیستمی نیاز پیدا کنید که براتون یونیت تست انجام بده، یه روز نیاز دارید دیتابیس و وبسرویس بیارید بالا و تست کنید، پس نیاز به سختافزار بهتری دارید. ۲− همیشه که قرار نیست با سی پلاس پلاس و پایتون کد بزنید،یه روز اگربخواید اندروید کد بزنید باید سیســـتمتون قوی باشـــه تا بتونید کار کنید. ۳− برنامه نویس های حرفه ای ازمحیط توسعه نرم افزار )ide( استفاده میکنن که بهشون توی برنامهنویسی کمک میکنه و سیستم بهتری رو نیاز داره. 
+
+            </p>
+            <h3>راهنمای خرید لپتاپ</h3>
+            <h4>رم:</h4>
+            <p> بالای ۸ گیگ ولی بالاتر از ۱۶ گیگ هم امروز اتلاف سرمایه ست. سی پی یو: برای اینتل: نسل حداقل ۶ و i۵ یا i۷ و برای AMD حداقل RYZEN۷ یا RYZEN۵ </p>
+            <h4>کارت گرافیک:</h4>
+            <p>برای برنامهنویســـی و ۹۹ درصد چیزهایی که توی دوره لیســـانس یاد میگیرید نیازی به کارت گرافیک حرفهای ندارید. معمولا کارت گرافیک هم روی قیمـــت خیلی تاثیرگذاره. گیگابایت هم معیار خوبی برای ســـنجش قدرت کارت گرافیک نیســـت، باید مشـــخصات کاملـــش رو در نظر بگیرید. هر حداقلی که لپتاپ ها دارن کفایت می کنه ولی اگـــر کارهای هوش مصنوعی و یادگیری ماشین بخواید انجام بدیـــد به کارت گرافیک حرفه ای تر احتیـــاج پیدا میکنید که احتمالا در دوره لیسانس فرصت نخواهید کرد</p>
+            <h4>حافظه:</h4>
+            <p>اینکه لپتاپی بگیرید که SSDداشـــته باشه قطعا در اولویته. چون تفاوت خیلی محسوســـی در سرعت و عملکرد احساس خواهید کرد. حتی اگر hdd نداشته باشه مشکلی پیش نمیاد که میتونید بعدا برای ذخیـــره فایلهاتون حافظـــه رو ارتقا بدید یا یه هارد اکســـترنال بگیریـــد. حداقل ۲۰۰ گیگ حافظـــه هم کفایت میکنه و بســـتگی به بودجتون داره. وزن:سعی کنید لپتاپ سبکی انتخاب کنید و به نظرم فاکتورمهمیه، چون عملا این لپتاپ به مدت ۴ سال توی کوله پشتیتون جای ثابت داره. پس بهتره که سبک باشه، به نظرم اگر بتونید زیر۲ کیلوگرم بگیرید عالیه. معمولا لپ تاپهای ۱۴ اینچی سبک و جمع جور هستن. </p>
+            <h4>مانیتـــور:</h4>
+            <p>مانیتور بـــا صفحه مات میتونه بهتر باشـــه چون بازتاب نور محیطش کمتره. رزولوشـــن و نرخ تازهسازی تصویر refresh rateهم اهمیتی توی برنامهنویسی ندارن. البته اگر توی روشنایی آفتاب هم بتونید ازش اســـتفاده کنید نکته مثبتی محســـوب میشه ولی اجباری نیســـت. روشنایی مانیتور هم برجســـب nits میسنجن. </p>
+            <h4>کیبورد:</h4>
+            <p>اگربک لایت  چراغ  داشته باشه خوبه که بتونید توی محیط های تاریک هم از صفحه کلیدتون اســـتفاده کنید ولـــی چندان نکته مهمی نیست که بخواید روش اصرار کنید</p>
+            <h4> درگاههای ورودی:</h4>
+            <p>برحســـب نیازتون تعداد درگاههای ورودی و نوع اونها رو چک کنید. داشـــتن تایپ C و تعـــداد درگاه USB میتونه نکته مثبت باشه ولی نکته اصلی نیست</p>
+            <h4> حسگر اثرانگشت، اسپیکر درگاههای اضافی و ...:</h4>
+            <p>هیچ کدوم اینها اهمیتی ندارن پس خودتونو درگیرش نکنید.</p>
+            <h4> قیمت:</h4>
+            <p> سعی کنید به اندازه کافی تحقیق کنید و سایتهای مختلف و معتبر رو چک کنید. معمولا خرید آنلاین قیمت مناسبتری داره. اگر دنبال لپتاپهایی با قیمت مناســـبتر هستیـــد میتونید به لپتاپ اســـتوک و دســـت دوم هم فکر کنید. اگر فاکتور لپتاپتون هم بیارید دانشگاه تا سقف ۱۰ میلیون بهتون وام میده. </p>
+
+        </div>
+
+        <div id="linux" class="section">
+            <h2><i class="fab fa-linux icon"></i> آشنایی با لینوکس</h2>
+            <h3>۴− با لینوکس دوست بشید</h3>
+            <p>
+                توی رشـــته کامپیوتر از لینوکس زیاد حرف میزنن. حداقل باید یک بار امتحانش کنید. توی درس آز سیســـتمعامل هـــم باید با لینوکس کار کنید.پساگرازقبلآشـــناییداشتهباشیدمیتونهخیلیبهتونکمک کنه. همچنین پروژه درس شبکه هم به احتمال زیاد باید روی لینوکس پیادهسازی کنید. پیشـــنهاد مـــن اینه کـــه بـــرای شروع اوبونتـــو رو روی ماشین مجازی virtual box یا vmwareامتحان کنید. اگه سیستم چندان قوی ای نداریـــد و میخوایـــد در کنار ویندوز نصبش کنیـــد، ترجیحا بار اول نصبش رو روی سیســـتمتون امتحان نکنید و به کسی بسپارید که یک بار این کار رو انجام داده. البته ســـعی کنید مستقل باشید و با سرچ و پرسیدن از گوگل کارهاتون رو راه بندازید. نهایتش یه بار هاردتونو کامل پاک میکنید ولی بار بعدی نه 
+
+            </p>
+        </div>
+
+        <div id="resources" class="section">
+            <h2><i class="fas fa-book icon"></i> منابع آموزشی</h2>
+            <ul>
+                <li><a href="https://www.w3schools.com/" target="_blank">W3Schools</a> - برای یادگیری HTML, CSS, JavaScript</li>
+                <li><a href="https://www.codecademy.com/" target="_blank">Codecademy</a> - دوره‌های تعاملی برنامه‌نویسی</li>
+                <li><a href="https://github.com/" target="_blank">GitHub</a> - برای مدیریت پروژه و نمونه کارها</li>
+                <li><a href="https://stackoverflow.com/" target="_blank">Stack Overflow</a> - برای رفع اشکال و پرسش و پاسخ</li>
+            </ul>
+        </div>
+        <div id="contact" class="section">
+            <h2><i class="fas fa-phone icon"></i> ســــــایت هـا و کانالهای مفید</h2>
+            <h3 > 
+                <h3>سامانه تغذیه :</h3>
+                <p> food.razi.ac.ir از اینجا میتونید غذای هفته بعدتون رو رزرو کنید.</p>
+                <br> 
+            <h3>سامانه استخر:</h3> 
+            <p>pool.razi.ac.ir استخر رو از اینجا میتونید رزرو کنید.</p>  <br>
+            <h3>پایگاه اطلاعاتی کتابخانه:</h3>
+            <p>lib.razi.ac.ir/Dl/SPortal/SPAges/30_22.aspx  میتونید به صورت رایگان به مقالات فارسی و انگلیسی دسترسی پیدا کنید.</p>
+             
+            
+            <h3>اخبار و اطلاعات گروه </h3>
+            
+            <p> اخبار و اطلاعات گروه کامپیوتر:  @RAZICEIT</p>
+            <p>انجمن علمی:  @Razi_CES</p>
+                <br> 
+            <h3>شماره تلفن های ضروری دانشگاه</h3>
+            <p>
+            معاونت آموزشی : 08334274513
+            <br>
+                            
+            معاونت دانشجویی : 08334274519 
+            <br>    
+            تحصیلات تکمیلی : 08334277606 
+<br>
+            تحصیلات تکمیلی : 08334277889 
+            <br>
+            مدیر امور دانشجویی : 08334277997 
+            <br>
+            حسابداری : 08334277990
+            <br>
+            اداره رفاه : 08334277889
+            <br>
+            کارشناس اداره رفاه : 
+            08334274517 
+            <br>
+            مرکز مشاوره : 08334277880
+            <br>
+            اداره تغذیه : 08334271768
+<br>
+            کارشناس تغذیه : 08334280938 
+<br>
+            سرپرست اداره خوابگاه : 
+            08334277994 
+<br>
+            مسئول پذیرش خوابگاه : 08334274518 
+<br>
+            مرکز بهداشت : 08334274511
+<br>
+            خشکشویی : 09182292219
+            <br>
+            آژانس رازی : 08334277550
+            </p>
+            
+        </div>
+
+        <div id="community" class="section">
+            <h2><i class="fas fa-users icon"></i> انجمن‌های دانشجویی</h2>
+            <p>پیوستن به انجمن‌های دانشجویی می‌تواند به شما در یادگیری، نتورکینگ و کسب تجربه کمک کند:</p>
+            <ul>
+                <li>انجمن علمی دانشکده</li>
+                <li>گروه‌های برنامه‌نویسی دانشگاه</li>
+                <li>رویدادهای هکاتون و استارتاپ ویکند</li>
+            </ul>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress" id="progress">0%</div>
+        </div>
+        <button class="nav-button tooltip" id="prevButton">قبلی</button>
+        <button class="nav-button tooltip" id="nextButton">بعدی</button>
+    </div>
+    <footer style="color: aliceblue;">
+        <p>&copy;  انجمن مهندسی کامپیتور دانشگاه رازی  ۱۴۰۳</p>
+    </footer>
+
+    
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const sections = ['greating' ,'quera', 'programming', 'laptop', 'linux', 'resources' ,'contact', 'community'];
+    let visitedSections = [];
+    let currentSectionIndex = 0;
+
+    function showSection(sectionId) {
+        sections.forEach(id => {
+            const section = document.getElementById(id);
+            if (section) {
+                section.style.display = id === sectionId ? 'block' : 'none';
+            }
+        });
+        if (!visitedSections.includes(sectionId)) {
+            visitedSections.push(sectionId);
+        }
+        currentSectionIndex = sections.indexOf(sectionId);
+        updateProgress();
+        updateNavigationButtons();
+    }
+
+    function updateProgress() {
+        const uniqueVisited = [...new Set(visitedSections)];
+        const progress = (uniqueVisited.length / sections.length) * 100;
+        const progressBar = document.getElementById('progress');
+        progressBar.style.width = `${progress}%`;
+        progressBar.textContent = `${Math.round(progress)}%`;
+    }
+
+    function updateNavigationButtons() {
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+        
+        prevButton.disabled = currentSectionIndex === 0;
+        nextButton.disabled = currentSectionIndex === sections.length - 1;
+    }
+
+    function nextSection() {
+        if (currentSectionIndex < sections.length - 1) {
+            showSection(sections[currentSectionIndex + 1]);
+        }
+    }
+
+    function previousSection() {
+        if (currentSectionIndex > 0) {
+            showSection(sections[currentSectionIndex - 1]);
+        }
+    }
+
+    // Add event listeners to buttons
+    sections.forEach(id => {
+        const button = document.querySelector(`button[onclick="showSection('${id}')"]`);
+        if (button) {
+            button.addEventListener('click', () => showSection(id));
+        }
+    });
+
+    // Add event listeners for next and previous buttons
+    const prevButton = document.getElementById('prevButton');
+    const nextButton = document.getElementById('nextButton');
+    
+    if (prevButton) {
+        prevButton.addEventListener('click', previousSection);
+    }
+    
+    if (nextButton) {
+        nextButton.addEventListener('click', nextSection);
+    }
+
+    // Initially show the first section
+    showSection('greating');
+});
+    </script>
+</html>

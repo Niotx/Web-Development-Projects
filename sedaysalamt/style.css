@@ -1,0 +1,70 @@
+body {
+      font-family: 'Vazir', sans-serif;
+      background: linear-gradient(to right, #388e3c, #1976d2);
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .navbar {
+      
+    }
+
+    .navbar-brand, .nav-link {
+      color: #ffffff !important;
+    }
+
+    .hero {
+      height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: white;
+      animation: fadeIn 1s ease-in-out;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 2rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .content-section {
+      color: #333;
+      background-color: #f7f7f7;
+      padding: 2rem;
+      border-radius: 8px;
+    }
+
+    .footer {
+      
+      color: #ffffff;
+      padding: 1.5rem 0;
+      text-align: center;
+    }
+
+    .footer a {
+      color: #4CAF50;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .img-fluid {
+      max-width: 100%;
+      height: auto;
+      transition: transform 0.3s;
+    }
+
+    .img-fluid:hover {
+      transform: scale(1.05);
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }

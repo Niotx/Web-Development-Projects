@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Chatbot</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Vazirmatn Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        [v-cloak] { display: none; }
+        
+        :root {
+            --primary-gradient: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            --secondary-gradient: linear-gradient(135deg, #e6f7ec 0%, #c8e6d2 100%);
+        }
+
+        .dark-mode {
+            --primary-gradient: linear-gradient(135deg, #1a472a 0%, #2d5a40 100%);
+            --secondary-gradient: linear-gradient(135deg, #2d5a40 0%, #1a472a 100%);
+            background-color: #1a1a1a;
+            color: white;
+        }
+
+        .sidebar {
+            background: var(--secondary-gradient);
+            transition: all 0.3s ease;
+        }
+
+        .chat-header {
+            background: var(--primary-gradient);
+        }
+
+        .message-bot {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 15px;
+            padding: 10px 15px;
+            margin: 5px 0;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .message-user {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 15px;
+            padding: 10px 15px;
+            margin: 5px 0;
+            max-width: 80%;
+            margin-left: auto;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .rtl {
+            direction: rtl;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        .ltr {
+            direction: ltr;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .typing-indicator {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: .5; }
+            50% { opacity: 1; }
+            100% { opacity: .5; }
+        }
+
+        .chat-container {
+            height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+
+        .hover-scale {
+            transition: transform 0.2s;
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body :class="{ 'dark-mode': isDark }" v-cloak>
+    <div id="app" class="vh-100">
+        <div class="container-fluid h-100">
+            <div class="row h-100">
+                <!-- Sidebar -->
+                <div class="col-md-3 col-lg-3 p-3 sidebar" :class="languages[currentLang].dir">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0">{{ translations[currentLang].chatHistory }}</h4>
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    
+                    <div class="chat-history">
+                        <div v-for="chat in messages" :key="chat.id" 
+                             class="p-3 rounded hover-scale mb-2" 
+                             style="background: rgba(0,0,0,0.05);">
+                            <div>{{ chat.message }}</div>
+                            <small class="text-muted">{{ new Date(chat.timestamp).toLocaleTimeString() }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Chat Area -->
+                <div class="col-md-9 col-lg-9 p-0 d-flex flex-column">
+                    <!-- Header -->
+                    <div class="chat-header p-3 text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                                <button v-for="(lang, code) in languages" 
+                                        :key="code"
+                                        @click="currentLang = code"
+                                        class="btn btn-outline-light btn-sm"
+                                        :class="{ active: currentLang === code }">
+                                    {{ lang.name }}
+                                </button>
+                            </div>
+                            <div>
+                                <button @click="isDark = !isDark" class="btn btn-outline-light me-2">
+                                    <i :class="isDark ? 'fas fa-sun' : 'fas fa-moon'"></i>
+                                </button>
+                                <button class="btn btn-outline-light">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Messages Area -->
+                    <div class="chat-container p-3" ref="chatContainer">
+                        <div v-for="msg in messages" :key="msg.id">
+                            <div :class="msg.isBot ? 'message-bot' : 'message-user'">
+                                {{ msg.message }}
+                            </div>
+                        </div>
+                        <div v-if="isTyping" class="message-bot typing-indicator">
+                            typing...
+                        </div>
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="p-3 border-top">
+                        <div class="d-flex gap-2">
+                            <button @click="toggleRecording" 
+                                    class="btn btn-success rounded-circle"
+                                    :class="{ 'pulse': isRecording }">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                            
+                            <input type="text" 
+                                   v-model="newMessage" 
+                                   @keyup.enter="sendMessage"
+                                   :class="languages[currentLang].dir"
+                                   class="form-control rounded-pill"
+                                   :placeholder="translations[currentLang].typeMessage">
+                            
+                            <button @click="toggleEmoji" class="btn btn-success rounded-circle">
+                                <i class="fas fa-smile"></i>
+                            </button>
+                            
+                            <label class="btn btn-success rounded-circle mb-0">
+                                <i class="fas fa-paperclip"></i>
+                                <input type="file" class="d-none" @change="handleFile">
+                            </label>
+                            
+                            <button @click="sendMessage" class="btn btn-success rounded-circle">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        const { createApp, ref, nextTick } = Vue
+
+        createApp({
+            setup() {
+                const isDark = ref(false)
+                const currentLang = ref('fa')
+                const newMessage = ref('')
+                const isTyping = ref(false)
+                const isRecording = ref(false)
+                const chatContainer = ref(null)
+
+                const languages = {
+                    fa: { name: 'فارسی', dir: 'rtl' },
+                    en: { name: 'English', dir: 'ltr' },
+                    ar: { name: 'العربية', dir: 'rtl' },
+                    tr: { name: 'Türkçe', dir: 'ltr' },
+                    fr: { name: 'Français', dir: 'ltr' }
+                }
+
+                const translations = {
+                    fa: {
+                        chatHistory: 'تاریخچه گفتگو',
+                        typeMessage: 'پیام خود را بنویسید...',
+                        suggestions: ['چطور می‌توانم کمک کنم؟', 'سوالات متداول', 'راهنمایی بیشتر']
+                    },
+                    en: {
+                        chatHistory: 'Chat History',
+                        typeMessage: 'Type your message...',
+                        suggestions: ['How can I help?', 'FAQ', 'More guidance']
+                    },
+                    ar: {
+                        chatHistory: 'سجل المحادثة',
+                        typeMessage: 'اكتب رسالتك...',
+                        suggestions: ['كيف يمكنني المساعدة؟', 'الأسئلة الشائعة', 'المزيد من التوجيه']
+                    },
+                    tr: {
+                        chatHistory: 'Sohbet Geçmişi',
+                        typeMessage: 'Mesajınızı yazın...',
+                        suggestions: ['Nasıl yardımcı olabilirim?', 'SSS', 'Daha fazla rehberlik']
+                    },
+                    fr: {
+                        chatHistory: 'Historique',
+                        typeMessage: 'Écrivez votre message...',
+                        suggestions: ['Comment puis-je aider?', 'FAQ', 'Plus de conseils']
+                    }
+                }
+
+                const messages = ref([
+                    { id: 1, message: 'Hello!', isBot: true, timestamp: new Date() },
+                    { id: 2, message: 'Hi there!', isBot: false, timestamp: new Date() }
+                ])
+
+                const scrollToBottom = async () => {
+                    await nextTick()
+                    chatContainer.value.scrollTop = chatContainer.value.scrollHeight
+                }
+
+                const sendMessage = () => {
+                    if (newMessage.value.trim()) {
+                        messages.value.push({
+                            id: messages.value.length + 1,
+                            message: newMessage.value,
+                            isBot: false,
+                            timestamp: new Date()
+                        })
+                        newMessage.value = ''
+                        isTyping.value = true
+                        
+                        scrollToBottom()
+
+                        // Simulate bot response
+                        setTimeout(() => {
+                            messages.value.push({
+                                id: messages.value.length + 1,
+                                message: translations[currentLang.value].suggestions[
+                                    Math.floor(Math.random() * 3)
+                                ],
+                                isBot: true,
+                                timestamp: new Date()
+                            })
+                            isTyping.value = false
+                            scrollToBottom()
+                        }, 1500)
+                    }
+                }
+
+                const toggleRecording = () => {
+                    isRecording.value = !isRecording.value
+                }
+
+                const toggleEmoji = () => {
+                    // Emoji picker functionality would go here
+                }
+
+                const handleFile = (event) => {
+                    const file = event.target.files[0]
+                    if (file) {
+                        messages.value.push({
+                            id: messages.value.length + 1,
+                            message: `File: ${file.name}`,
+                            isBot: false,
+                            timestamp: new Date(),
+                            isFile: true
+                        })
+                        scrollToBottom()
+                    }
+                }
+
+                return {
+                    isDark,
+                    currentLang,
+                    languages,
+                    translations,
+                    messages,
+                    newMessage,
+                    isTyping,
+                    isRecording,
+                    chatContainer,
+                    sendMessage,
+                    toggleRecording,
+                    toggleEmoji,
+                    handleFile
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>

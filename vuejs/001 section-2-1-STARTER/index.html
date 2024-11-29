@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>VueJS Course</title>
+    <link rel="stylesheet" type="text/css" href="main.css" />
+  </head>
+  <body>
+    <div id="app1" v-cloak>
+      <h1>{{fullName()}}</h1>
+      <a :href="url" target="_blank">Google</a>
+      <p v-html="raw_url"></p>
+      <p>{{age}}</p>
+      <hr>
+      <label >First Name</label>
+      <input type="text" v-model="firstName">
+      <label >Last Name</label>
+      <input type="text" :value="lastName" @input="updateLastName">
+      <button type="button" @click="increment">Increment</button>
+      <button type="button" @click="age--">Decrement</button>
+    </div>
+    <!--<div id="app2">
+      <h1>{{firstName}}</h1>
+      <h1>{{lastName}}</h1>
+    </div>> -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="app.js"></script> 
+  </body>
+</html>
